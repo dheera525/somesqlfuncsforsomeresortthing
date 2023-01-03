@@ -164,35 +164,3 @@ def getData(table, identifier, columnToGet="*", fetchAll=False):
     '''if type(result) == list and fetchAll: # Nope! Not needed since we're dealing with tables with multiple columns
         result = tuple( [x[0] for x in result] )'''
     return result
-
-
-def searchData(table, column, searchFor, fetchAll=False):
-    """
-    Table - A table in the selected database - String\n
-    Column - The column to search in - String\n
-    searchFor - The value to search for - String\n
-    fetchAll - Whether to fetch all entries in the form of a list - Boolean\n
-    """
-    readAll()
-    query = "SELECT " + column + " FROM " + table + \
-        " WHERE " + column + ' LIKE "%' + searchFor + '%"'
-    cursor.execute(query)
-    result = cursor.fetchall() if fetchAll else cursor.fetchone()
-    if type(result) == list and fetchAll:
-        result = tuple(map(lambda x: x[0], result))
-    return result
-
-
-def checkMatch(table, *checkers):
-    """
-    Check if one or more criteria is met in a column\n
-    Table - A table in the selected database - String\n
-    Checkers - *(Column, Value) - *Tuples\n
-    """
-    readAll()
-    query = "SELECT * FROM " + table + " WHERE "
-    for ind, val in enumerate(checkers):
-        query = query + val[0] + " = '" + val[1] + \
-            ("' AND " if ind != len(checkers) - 1 else "'")
-    cursor.execute(query)
-    return bool(cursor.fetchone())

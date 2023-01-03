@@ -1,8 +1,11 @@
 def encrypt(username,first,last,password):
+
+    # Creates an account, encrypts its password into a private and public key, the binds the user to both keys and saves it in the database
+
     from .cipher_suite import getEncryptionKey
     from dbfuncs.sqlfunc import insertData,updateData,loadColumn
 
-    vUsername = usernameValidator(username) # i havent initialized this, make the func urself
+    vUsername = usernameValidator(username)
     if not vUsername[0]: return vUsername
     
     try:
@@ -18,7 +21,6 @@ def encrypt(username,first,last,password):
         print("Error while encrypting password\n",e)
         return (False, "Error while encrypting password")
     
-    # Uploading password to passwords.json (now in sql because why not)
     AllMembers = loadColumn("members","username")
     
     if not username in AllMembers:
@@ -29,4 +31,4 @@ def encrypt(username,first,last,password):
     return (True,'success')
 
 def usernameValidator(username):
-    return (True, "yay success message ig") # however u want to handle usernames idk
+    return (True, "Done.") # No validation as of now

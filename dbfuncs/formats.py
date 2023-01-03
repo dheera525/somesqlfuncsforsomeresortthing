@@ -1,6 +1,7 @@
 # every table in the database and their formats
 
 class Format():
+    # This class basically takes 3 arguments. Table, Syntax and Columns. It organizes that into a class called format. (x).table, (x).syntax, (x).columns are ways to call it    
     def __init__ (self, table, syntax, columns):
         self.table = table 
         self.syntax = syntax 
