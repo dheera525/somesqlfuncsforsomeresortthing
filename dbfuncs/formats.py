@@ -1,7 +1,7 @@
 # every table in the database and their formats
 
 class Format():
-    # This class basically takes 3 arguments. Table, Syntax and Columns. It organizes that into a class called format. (x).table, (x).syntax, (x).columns are ways to call it    
+    # This class basically takes 3 arguments. Table, Syntax and Columns. It organizes that into a class called format. (x).table, (x).syntax, (x).columns define it's properties. 
     def __init__ (self, table, syntax, columns):
         self.table = table 
         self.syntax = syntax 
@@ -10,16 +10,16 @@ class Format():
 # Formats:
 
 Members = Format(
-    "members",
+    "members", # The name of the table | table
 
     """
     username varchar(255) PRIMARY KEY,
     firstName varchar(255) NOT NULL,
     lastName varchar(255) UNIQUE,
     password varchar(255) NOT NULL
-    """,
+    """, # The syntax to create the table | syntax
 
-    "(username, firstName, lastName, password)"
+    "(username, firstName, lastName, password)" # All the column names stored in a tuple. | columns
 )
 
 Resorts = Format(
