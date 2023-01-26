@@ -15,7 +15,7 @@ cursor = db.cursor()
 
 def readAll():
     try:
-        # important to read all the cursor data before attaching more data to the cursor
+        # important to read all the cursor data before attaching more data to the cursor because when you cursor.execute without cursor.fetch-ing all the data, the module might crash.
         selectDB()
         return cursor.fetchall()
     except:
@@ -37,7 +37,7 @@ def cleanConnection():
     db.close()
 
 
-def loadColumn(table, column):
+def loadColumn(table, column): # Gets all rows from a column
     """
     Table - A table in the selected database - String\n
     Column - A column in the table - String\n
@@ -46,11 +46,12 @@ def loadColumn(table, column):
     query = "SELECT " + column + " FROM " + table
     cursor.execute(query)
     result = cursor.fetchall()
-    result = list(map(lambda x: x[0], result))
+    result = list(map(lambda x: x[0], result)) # Converts [ (a,b), (x,y), (m,n)] to [a,x,m]
     return result
 
 
-def insertData(table, values):
+def insertData(table, values): # Inserts a tuple of values into a table. 
+    # Example: insertData("sometable", (1,"test",0.9))
     """
     Table - A table in the selected database - String\n
     Values - Values for inserting into table. All column values must be provided - Tuple( String, Int, Bool..)\n
@@ -70,7 +71,7 @@ def insertData(table, values):
     print(cursor.rowcount, "records affected")
 
 
-def getFormat(table):
+def getFormat(table): # Gets the format of a table. (Table, Syntax & Columns)
     """
     Table - A table in the selected database - String\n
     """
@@ -86,7 +87,8 @@ def getFormat(table):
     return formats[currdb][table]
 
 
-def deleteData(table, *operators):
+def deleteData(table, *operators): # Deletes a record based on some conditions (operators).
+    # Example: deleteData("testTable", ("number", 1)) will delete all values from testTable where the value of column "number" is 1.
     """ 
     Table - A table in the selected database - String\n
     Operators - Identifiers - Tuple( String, String ), Tuple( String, String )...\n
@@ -108,7 +110,7 @@ def deleteData(table, *operators):
     print(cursor.rowcount, "records affected")
 
 
-def executeSQL(query, commit=False):
+def executeSQL(query, commit=False): # cursor.execute basically. if commit=true then it will db.commit() after executing the query.
     """
     Query - Your SQL query - String\n
     Commit - Whether to commit after executing the cursor - Boolean\n
@@ -121,7 +123,8 @@ def executeSQL(query, commit=False):
     return cursor
 
 
-def updateData(table, toUpdateColumn, toUpdateValue, identifier):
+def updateData(table, toUpdateColumn, toUpdateValue, identifier): # Updates a certain column with a certain value where identifier matches.
+    # Example: updateData("TestTable", "Number", 1, ("Username", "hunter2")) will change the value of the column called "number" to 2 where the "username" column is "hunter2"
     """
     Table - A table in the selected database - String\n
     toUpdateColumn - The column in which the update takes place - String\n
@@ -146,7 +149,8 @@ def updateData(table, toUpdateColumn, toUpdateValue, identifier):
     print(cursor.rowcount, "records affected")
 
 
-def getData(table, identifier, columnToGet="*", fetchAll=False):
+def getData(table, identifier, columnToGet="*", fetchAll=False): # Gets all the columns from columnsToGet with the specified identifier.
+    # Example: getData("TestTable", ("number", 1), "name, password", True) will get all rows from the name and password column where the column "number" is 1. It will also return everything in a list because of fetchAll.
     """
     Table - A table in the selected database - String\n
     Identifier - Identifier to locate correct row(s) in the form of (Column, Value) - Tuple( String, String )\n
@@ -161,6 +165,4 @@ def getData(table, identifier, columnToGet="*", fetchAll=False):
             identifier[0] + " = " + "'{}'".format(identifier[1])
     cursor.execute(query)
     result = cursor.fetchall() if fetchAll else cursor.fetchone()
-    '''if type(result) == list and fetchAll: # Nope! Not needed since we're dealing with tables with multiple columns
-        result = tuple( [x[0] for x in result] )'''
     return result

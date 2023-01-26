@@ -1,6 +1,5 @@
 import uuid
 from . import sqlfunc as sf
-from .cipher.encryptor import encrypt
 import datetime as dt
 
 #  MEMBER FUNCTIONS
@@ -11,15 +10,15 @@ def member_GetName(username): # Gets the first and last name of a member and ret
 
 def member_Create(username, first, last, password):
     # This function creates an account.
-    encrypt(username, first, last, password)
+    sf.insertData("members", (username, first, last, password))
 
 def member_Delete(username):
 
     # This function takes as many tables (strings) as needed and uses the deleteData function from 'sqlfunc' module and deletes all records of the user.
     dlt = lambda *tables: [ sf.deleteData(table, ("username", username)) for table in tables]
 
-    # Deleting the account from members, encryption tokens and bookings
-    dlt("members", "encryptiontokens", "bookings")
+    # Deleting the user from the members and booking tables.
+    dlt("members", "bookings")
 
 def member_Modify(username, first=None, last=None, password=None, new_username=None):
     # Modify an account
@@ -32,13 +31,13 @@ def member_Modify(username, first=None, last=None, password=None, new_username=N
     """
     
     if password: # Checks if the password is being changed and does that first
-        encrypt(username, first, last, password)
+        sf.updateData("members", "password", password, ("username", username))
 
     id = ("username", new_username or username)        
 
     updateUsername = lambda tables: [sf.updateData(table, "username", new_username, id) for table in tables]  # THis function updates the username in all tables.
 
-    if new_username: updateUsername( ["members", "encryptiontokens", "bookings"] ) # Changes username in all tables with a username column.
+    if new_username: updateUsername( ["members", "bookings"] ) # Changes username in all tables with a username column.
     if first: sf.updateData("members", "firstName", first, id) # Change first name
     if last: sf.updateData("members", "lastName", last, id) # Change last name
 

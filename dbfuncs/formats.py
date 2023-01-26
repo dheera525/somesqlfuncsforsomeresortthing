@@ -22,17 +22,6 @@ Members = Format(
     "(username, firstName, lastName, password)"
 )
 
-EncryptionTokens = Format(
-    "encryptiontokens",
-
-    """
-    username varchar(255) PRIMARY KEY,
-    token varchar(255) NOT NULL
-    """,
-
-    "(username, token)"
-)
-
 Resorts = Format(
     "resorts",
 
@@ -69,7 +58,6 @@ Bookings = Format(
 formats = {
     "resortdb": {
         "members": Members,
-        "encryptiontokens": EncryptionTokens,
         "resorts": Resorts,
         "bookings": Bookings
     }

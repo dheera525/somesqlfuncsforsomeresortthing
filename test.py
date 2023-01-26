@@ -29,6 +29,7 @@ print(member_GetName("testacc")) # assert {'first_name': 'Derin', 'last_name': '
 
 # Changing data of a member
 member_Modify("testacc", first="Brian")
+member_Modify(username="testacc", password="anEvenMoreSecretPasswordxyz123")
 
 # Checking the changed data
 print(member_GetName("testacc")) # assert {'first_name': 'Brian', 'last_name': 'Arken'}
