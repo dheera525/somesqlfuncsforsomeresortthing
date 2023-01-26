@@ -2,7 +2,6 @@
 
 from .formats import formats
 from . import sqlfunc
-from os import name as osname
 
 def fixData():
     for db_ in formats: # For each database in formats..
