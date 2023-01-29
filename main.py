@@ -418,8 +418,60 @@ def clientMenu():
         commandHandler[res]() # Execute the respective command
         input("\n")
         
-        
+def adminMenu():
 
+    first_name = member_GetName(USERNAME)["first_name"]
+
+    date = dt.datetime.today().strftime("%A | %I:%M %p")
+
+    rows = [ 
+        ["| Resorts"],
+        ["  (1)", "Add a resort"],
+        ["  (2)", "Remove a resort"],
+        ["  (3)", "Modify a resort"],
+        ["| Bookings"],
+        ["  (4)", "See bookings for a certain user"],
+        ["  (5)", "Cancel a booking"],
+        ["  (6)", "Modify a booking"],
+        ["| Users"],
+        ["  (7)", "Modify a user"],
+        ["  (8)", "Delete a user"],
+        ["| System"],
+        ["  (e)", "Exit application"]
+         ]
+
+    commandHandler = {
+        'e': exit
+    }
+
+    menuLayout = (
+        ["", "", "", "X"],
+        ['', f"", date + f"\nWelcome back, {first_name}"],
+        ["","",""],
+        *rows
+    )
+
+    menuTable = tt.SingleTable(menuLayout, "| VV - Admin Panel |")
+    menuTable.justify_columns = {0: 'left', 1: "left", 3: 'right', 4: 'right'}
+    menuTable.outer_border = True
+    menuTable.inner_heading_row_border = True
+    menuTable.inner_column_border = False
+
+    while True:
+
+        print(menuTable.table)
+        res = input("Enter the number of the command you'd like to execute\n> ")
+
+        try: res = int(res) # attempt to convert res to an integer
+        except ValueError: pass
+
+        if res not in commandHandler.keys():
+            clearScreen()
+            print("That's an invalid command! Please only select a command from this list.")
+            continue
+            
+        commandHandler[res]() # Execute the respective command
+        input("\n")
 
 """ RUNTIME CODE """
 
@@ -445,8 +497,6 @@ while True:
     if USER_PRIVILEGE == 1:
         clientMenu() # Open up the client menu if the user is a client
     elif USER_PRIVILEGE == 0:
-        pass # Open up the admin menu if the user is an admin
+        adminMenu() # Open up the admin menu if the user is an admin
     
     exit(0)
-
-
