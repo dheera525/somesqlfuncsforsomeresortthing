@@ -8,7 +8,7 @@ fixData()
 # Importing functions for:
 
 from dbfuncs.controller import \
-    member_Create, member_Delete, member_GetBookings, member_GetName, member_Modify  # The members table
+    member_Create, member_Delete, member_GetBookings, member_GetName, member_Modify, member_GetLoginDetails  # The members table
 from dbfuncs.controller import \
     resort_Create, resort_Delete, resort_GetBookings, resort_GetDetails, resort_Modify # The resorts table
 from dbfuncs.controller import \

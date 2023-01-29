@@ -41,8 +41,14 @@ def member_Modify(username, first=None, last=None, password=None, new_username=N
     if first: sf.updateData("members", "firstName", first, id) # Change first name
     if last: sf.updateData("members", "lastName", last, id) # Change last name
 
-def member_GetBookings(name):
-    return sf.getData( "bookings", ("username", name), fetchAll=True)
+def member_GetBookings(username): # Get all bookings for a member.
+    return sf.getData( "bookings", ("username", username), fetchAll=True)
+
+def member_GetLoginDetails(username): # Get a member's username and password
+    data = sf.getData("members", ("username", username), "username, password")
+    if not data: return None
+    username, password = sf.getData("members", ("username", username), "username, password")
+    return {"username": username, "password": password}
 
 # BOOKING FUNCTIONS 
 
@@ -71,8 +77,17 @@ def resort_Delete(name): # Careful, name is case sensitive! Make sure you don't 
     sf.deleteData("bookings", ("resort_name", name))
 
 def resort_GetDetails(name, *columns):
+    # Get the details of a single resort
     columnsToGet = ",".join( list(map(str, columns)) )
-    return dict( zip(columns, sf.getData("resorts", ("name", name), columnsToGet)) )
+    resort = sf.getData("resorts", ("name", name), columnsToGet or "*")
+    if not resort: return None
+    else: return dict( zip(columns or ["name", 'location', 'price', 'description', 'facilities'], resort) )
+
+def resort_GetAll(*columns):
+    # Get the details of all resorts
+    columnsToGet = ",".join( list(map(str, columns)) )
+    return [ dict( zip(columns, resort)) for resort in sf.getData("resorts", columnToGet=columnsToGet, fetchAll=True) ]
+
 
 def resort_GetBookings(name):
     return sf.getData( "bookings", ("resort_name", name), fetchAll=True)
@@ -119,6 +134,15 @@ def booking_GetDetails(id, *columns):
     result = dict( zip( columns, sf.getData("bookings", ("id", id), columnsToGet) ) )
     if any([ column in ["start_date", "end_date", "*"] for column in columns]): result.update( booking_GetTiming(id) )
     return result
+
+def booking_GetAll(*columns):
+    # Gets details of all bookings
+    columns = ["resort_name", "username", "start_date", "end_date", "occupants","cost","id"]
+    columnsToGet = ",".join( list(map(str, columns)) )
+    results = [ dict(zip( columns, booking )) for booking in sf.getData("bookings", columnToGet=columnsToGet or None, fetchAll=True) ]
+    for result in results:
+        if any([ column in ["start_date", "end_date", "*"] for column in columns]): result.update( booking_GetTiming(result["id"]) )
+    return results
 
 def booking_GetBookingsBy(start_date_before:dt.date=None, end_date_before:dt.date=None, occupants:int=None, cost:int=None):
     # Gets bookings based on a constraint

@@ -28,3 +28,5 @@ def fixData():
                 except Exception as e: # If it errors, print it.
                     print(e)
                     pass
+
+    sqlfunc.selectDB() # Finally, select the appropriate database.

@@ -1,1 +1,2 @@
 mysql-connector-python==8.0.30
+terminaltables==3.1.10

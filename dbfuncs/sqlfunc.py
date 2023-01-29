@@ -29,7 +29,6 @@ def selectDB(db="resortDB"):
     readAll()
     return cursor.execute("USE " + db)
 
-
 def cleanConnection():
     """
     To close the database connection
@@ -68,7 +67,6 @@ def insertData(table, values): # Inserts a tuple of values into a table.
     query = "INSERT INTO " + table + ' ' + syntax + ' VALUES ' + placeHolder
     cursor.execute(query, values)
     db.commit()
-    print(cursor.rowcount, "records affected")
 
 
 def getFormat(table): # Gets the format of a table. (Table, Syntax & Columns)
@@ -107,7 +105,6 @@ def deleteData(table, *operators): # Deletes a record based on some conditions (
             operator[0] + " = " + "\"{}\"".format(operator[1])
     cursor.execute(query)
     db.commit()
-    print(cursor.rowcount, "records affected")
 
 
 def executeSQL(query, commit=False): # cursor.execute basically. if commit=true then it will db.commit() after executing the query.
@@ -146,10 +143,9 @@ def updateData(table, toUpdateColumn, toUpdateValue, identifier): # Updates a ce
         values = values + (identifier[1],)
     cursor.execute(query, values)
     db.commit()
-    print(cursor.rowcount, "records affected")
 
 
-def getData(table, identifier, columnToGet="*", fetchAll=False): # Gets all the columns from columnsToGet with the specified identifier.
+def getData(table, identifier=None, columnToGet="*", fetchAll=False): # Gets all the columns from columnsToGet with the specified identifier.
     # Example: getData("TestTable", ("number", 1), "name, password", True) will get all rows from the name and password column where the column "number" is 1. It will also return everything in a list because of fetchAll.
     """
     Table - A table in the selected database - String\n

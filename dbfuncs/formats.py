@@ -15,7 +15,7 @@ Members = Format(
     """
     username varchar(255) PRIMARY KEY,
     firstName varchar(255) NOT NULL,
-    lastName varchar(255) UNIQUE,
+    lastName varchar(255),
     password varchar(255) NOT NULL
     """, # The syntax to create the table | syntax
 
@@ -40,13 +40,13 @@ Bookings = Format(
     "bookings",
 
     """
-    resort_name varchar(255) PRIMARY KEY,
-    username varchar(255) UNIQUE NOT NULL,
+    resort_name varchar(255),
+    username varchar(255) NOT NULL,
     start_date date NOT NULL,
     end_date date,
     occupants int DEFAULT 1,
     cost int NOT NULL,
-    id varchar(50) UNIQUE,
+    id varchar(50) PRIMARY KEY,
     FOREIGN KEY (resort_name) REFERENCES resorts(name) on update cascade on delete cascade
     """,
 
