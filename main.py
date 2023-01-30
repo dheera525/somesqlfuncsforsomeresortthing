@@ -308,7 +308,7 @@ def bookResort():
 def seeBookings():
     global USERNAME
 
-    all_bookings = booking_GetAll()
+    all_bookings = member_GetBookings(USERNAME)
 
     bookingsTableData = []
 
@@ -407,7 +407,7 @@ def clientMenu():
         print(menuTable.table)
         res = input("Enter the number of the command you'd like to execute\n> ")
 
-        try: res = int(res) # attempt to convert res to an integer
+        try: res = int(res) # attempt to convert response to an integer
         except ValueError: pass
 
         if res not in commandHandler.keys():
@@ -417,10 +417,157 @@ def clientMenu():
             
         commandHandler[res]() # Execute the respective command
         input("\n")
-        
-def adminMenu():
 
+def changeUsername():
+    global USERNAME
+
+    while True:
+        print( tt.SingleTable([ ["Enter your new username. [ 4 characters < ]"] ]).table )    
+
+        res = input("> ")
+
+        if len(res) <= 4:
+            clearScreen()
+            print("Your new username has to be greater than 4 characters.")
+            continue
+        elif res.lower() == USERNAME.lower():
+            clearScreen()
+            print("Your new username cannot be the same as your current username.")
+            continue
+        else:
+            member_Modify(USERNAME, new_username=res)
+            print( tt.SingleTable([ ["Successfully changed your username to " + res + "!"] ]).table )    
+            input('\n')
+            break
+
+
+def changePassword():
+    global USERNAME
+    old_pass =  member_GetLoginDetails(USERNAME)["password"]
+
+    while True:
+        print( tt.SingleTable([ ["Enter your new password [ 5 characters < ]"] ]).table )   
+
+        res = input("> ")
+
+        if len(res) <= 4:
+            clearScreen()
+            print("Your new password has to be greater than 5 characters.")
+            continue
+        elif res.lower() == old_pass.lower():
+            clearScreen()
+            print("Your new password cannot be the same as your old password.")
+            continue
+        
+        print( tt.SingleTable([ ["Enter your password again"] ]).table )
+        res2 = input(">")
+
+        if res2 != res:
+            clearScreen()
+            print("Passwords do not match.")
+            continue
+
+        member_Modify(USERNAME, password=res)
+        print( tt.SingleTable([ ["Successfully updated your password!"] ]).table )
+        input('\n')
+        break
+
+def updateFirstName():
+    global USERNAME
     first_name = member_GetName(USERNAME)["first_name"]
+
+    while True:
+        print( tt.SingleTable([ [f"Enter your new first name\nCurrent: '{first_name}'"] ]).table )   
+
+        res = input("> ")
+
+        if len(res) <= 1:
+            clearScreen()
+            print("Your new first name has to be greater than 1 character.")
+            continue
+
+        member_Modify(USERNAME, first=res)
+        print( tt.SingleTable([ ["Successfully updated your password!"] ]).table )
+        input('\n')
+        break
+
+def updateLastName():
+    global USERNAME
+    last_name = member_GetName(USERNAME)["last_name"]
+
+    while True:
+        print( tt.SingleTable([ [f"Enter your new last name\nCurrent: '{last_name}'"] ]).table )   
+
+        res = input("> ")
+
+        if len(res) <= 1:
+            clearScreen()
+            print("Your new last name has to be greater than 1 character.")
+            continue
+
+        member_Modify(USERNAME, last=res)
+        print( tt.SingleTable([ ["Successfully updated your password!"] ]).table )
+        input('\n')
+        break
+
+def userSettingsMenu():
+
+    date = dt.datetime.today().strftime("%A | %I:%M %p")
+
+    rows = [ 
+        ["| User Settings"],
+        ["  (1)", "Change Username"],
+        ["  (2)", "Change Password"],
+        ["  (3)", "Update First Name"],
+        ["  (4)", "Update Last Name"],
+        ["| Misc."],
+        ["  (l)", "Logout"],
+        ["  (b)", "Go back to main menu"]
+    ]
+
+    commandHandler = {
+        1: changeUsername,
+        2: changePassword,
+        3: updateFirstName,
+        4: updateLastName,
+        'l': restart
+    }
+
+    menuLayout = (
+        ["", "", "", "X"],
+        ['', f"", date + f"\nUser | {USERNAME}"],
+        ["","",""],
+        *rows
+    )
+
+    menuTable = tt.SingleTable(menuLayout, f"| VV - {USERNAME} |")
+    menuTable.justify_columns = {0: 'left', 1: "left", 3: 'right', 4: 'right'}
+    menuTable.outer_border = True
+    menuTable.inner_heading_row_border = True
+    menuTable.inner_column_border = False
+
+    while True:
+
+        clearScreen()
+        print(menuTable.table)
+        res = input("Enter the number of the command you'd like to execute\n> ")
+
+        try: res = int(res) # attempt to convert response to an integer
+        except ValueError: pass
+
+        if res == 'b': break
+
+        if res not in commandHandler.keys():
+            clearScreen()
+            print("That's an invalid command! Please only select a command from this list.")
+            continue
+
+        commandHandler[res]() # Execute the respective command
+        input("\n")
+
+
+
+def adminMenu():
 
     date = dt.datetime.today().strftime("%A | %I:%M %p")
 
@@ -431,6 +578,7 @@ def adminMenu():
         ["  (3)", "Modify a resort"],
         ["| Bookings"],
         ["  (4)", "See bookings for a certain user"],
+        ["  (5)", "See all bookings"],
         ["  (5)", "Cancel a booking"],
         ["  (6)", "Modify a booking"],
         ["| Users"],
@@ -438,7 +586,7 @@ def adminMenu():
         ["  (8)", "Delete a user"],
         ["| System"],
         ["  (e)", "Exit application"]
-         ]
+    ]
 
     commandHandler = {
         'e': exit
@@ -446,7 +594,7 @@ def adminMenu():
 
     menuLayout = (
         ["", "", "", "X"],
-        ['', f"", date + f"\nWelcome back, {first_name}"],
+        ['', f"", date + f"\nWelcome back, ADMIN"],
         ["","",""],
         *rows
     )
@@ -462,7 +610,7 @@ def adminMenu():
         print(menuTable.table)
         res = input("Enter the number of the command you'd like to execute\n> ")
 
-        try: res = int(res) # attempt to convert res to an integer
+        try: res = int(res) # attempt to convert response to an integer
         except ValueError: pass
 
         if res not in commandHandler.keys():

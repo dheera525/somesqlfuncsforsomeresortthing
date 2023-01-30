@@ -42,7 +42,12 @@ def member_Modify(username, first=None, last=None, password=None, new_username=N
     if last: sf.updateData("members", "lastName", last, id) # Change last name
 
 def member_GetBookings(username): # Get all bookings for a member.
-    return sf.getData( "bookings", ("username", username), fetchAll=True)
+    columns = ["resort_name", "username", "start_date", "end_date", "occupants","cost","id"]
+    columnsToGet = ",".join( list(map(str, columns)) )
+    results = [ dict(zip( columns, booking )) for booking in sf.getData("bookings", identifier=("username", username), columnToGet=columnsToGet or None, fetchAll=True) ]
+    for result in results:
+        if any([ column in ["start_date", "end_date", "*"] for column in columns]): result.update( booking_GetTiming(result["id"]) )
+    return results
 
 def member_GetLoginDetails(username): # Get a member's username and password
     data = sf.getData("members", ("username", username), "username, password")
