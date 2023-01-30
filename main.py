@@ -84,7 +84,7 @@ def askPersist( toAsk:list, header=(['',''],), title='', footer=([''],), breakPo
         # 2: A key-value based nested list called ALL_DETAILS
         # For Example: [ ["Username", "HiddenEntropy100"], ["Code", 119081].. etc ]
         # 3: The current query/key being requested. Example: ["Name", "Entering..."]
-        table_data = [ *header, *zip( [ f'{index + 1}: {key}' for index,key in enumerate(ALL_DETAILS) ], [ value for value in ALL_DETAILS.values() ] ), [ f'{len(ALL_DETAILS) + 1}: ' + query, "Entering..."], [''], [''],[footer]]
+        table_data = [ *header, *zip( [ f'{index + 1}: {key.capitalize()}' for index,key in enumerate(ALL_DETAILS) ], [ value for value in ALL_DETAILS.values() ] ), [ f'{len(ALL_DETAILS) + 1}: ' + query, "Entering..."], [''], [''],[footer]]
         table_instance = tt.SingleTable(table_data, title) # Make a single-line table out of it.
 
         # Makes a nice table without inner borders.
@@ -100,6 +100,7 @@ def askPersist( toAsk:list, header=(['',''],), title='', footer=([''],), breakPo
         response = None
 
         while True:
+            clearScreen()
             print( askBox(query_detail) )
             response = input(f"Enter your {query_detail}\n> ")
 
@@ -407,6 +408,8 @@ def clientMenu():
         print(menuTable.table)
         res = input("Enter the number of the command you'd like to execute\n> ")
 
+        if res == 'e': break
+
         try: res = int(res) # attempt to convert response to an integer
         except ValueError: pass
 
@@ -422,9 +425,11 @@ def changeUsername():
     global USERNAME
 
     while True:
-        print( tt.SingleTable([ ["Enter your new username. [ 4 characters < ]"] ]).table )    
+        print( tt.SingleTable([ ["Enter your new username. [ 4 characters < ]\nPress'e' to exit"] ]).table )    
 
         res = input("> ")
+
+        if res == 'e': break
 
         if len(res) <= 4:
             clearScreen()
@@ -436,8 +441,7 @@ def changeUsername():
             continue
         else:
             member_Modify(USERNAME, new_username=res)
-            print( tt.SingleTable([ ["Successfully changed your username to " + res + "!"] ]).table )    
-            input('\n')
+            print( tt.SingleTable([ ["Successfully changed your username to " + res + "!"] ]).table )  
             break
 
 
@@ -446,9 +450,11 @@ def changePassword():
     old_pass =  member_GetLoginDetails(USERNAME)["password"]
 
     while True:
-        print( tt.SingleTable([ ["Enter your new password [ 5 characters < ]"] ]).table )   
+        print( tt.SingleTable([ ["Enter your new password [ 5 characters < ]\nPress'e' to exit"] ]).table )   
 
         res = input("> ")
+
+        if res == 'e': break
 
         if len(res) <= 4:
             clearScreen()
@@ -459,8 +465,10 @@ def changePassword():
             print("Your new password cannot be the same as your old password.")
             continue
         
-        print( tt.SingleTable([ ["Enter your password again"] ]).table )
+        print( tt.SingleTable([ ["Enter your password again\nPress'e' to exit"] ]).table )
         res2 = input(">")
+
+        if res2 == 'e': break
 
         if res2 != res:
             clearScreen()
@@ -469,7 +477,6 @@ def changePassword():
 
         member_Modify(USERNAME, password=res)
         print( tt.SingleTable([ ["Successfully updated your password!"] ]).table )
-        input('\n')
         break
 
 def updateFirstName():
@@ -477,9 +484,11 @@ def updateFirstName():
     first_name = member_GetName(USERNAME)["first_name"]
 
     while True:
-        print( tt.SingleTable([ [f"Enter your new first name\nCurrent: '{first_name}'"] ]).table )   
+        print( tt.SingleTable([ [f"Enter your new first name\nCurrent: '{first_name}'\nPress'e' to exit"] ]).table )   
 
         res = input("> ")
+
+        if res == 'e': break
 
         if len(res) <= 1:
             clearScreen()
@@ -488,7 +497,6 @@ def updateFirstName():
 
         member_Modify(USERNAME, first=res)
         print( tt.SingleTable([ ["Successfully updated your password!"] ]).table )
-        input('\n')
         break
 
 def updateLastName():
@@ -496,9 +504,11 @@ def updateLastName():
     last_name = member_GetName(USERNAME)["last_name"]
 
     while True:
-        print( tt.SingleTable([ [f"Enter your new last name\nCurrent: '{last_name}'"] ]).table )   
+        print( tt.SingleTable([ [f"Enter your new last name\nCurrent: '{last_name}'\nPress'e' to exit"] ]).table )   
 
         res = input("> ")
+
+        if res == 'e': break
 
         if len(res) <= 1:
             clearScreen()
@@ -507,12 +517,12 @@ def updateLastName():
 
         member_Modify(USERNAME, last=res)
         print( tt.SingleTable([ ["Successfully updated your password!"] ]).table )
-        input('\n')
         break
 
-def userSettingsMenu():
+def userSettingsMenu(user=None):
 
     date = dt.datetime.today().strftime("%A | %I:%M %p")
+    user = user or USERNAME
 
     rows = [ 
         ["| User Settings"],
@@ -535,12 +545,12 @@ def userSettingsMenu():
 
     menuLayout = (
         ["", "", "", "X"],
-        ['', f"", date + f"\nUser | {USERNAME}"],
+        ['', f"", date + f"\nUser | {user}"],
         ["","",""],
         *rows
     )
 
-    menuTable = tt.SingleTable(menuLayout, f"| VV - {USERNAME} |")
+    menuTable = tt.SingleTable(menuLayout, f"| VV - {user} |")
     menuTable.justify_columns = {0: 'left', 1: "left", 3: 'right', 4: 'right'}
     menuTable.outer_border = True
     menuTable.inner_heading_row_border = True
@@ -565,6 +575,295 @@ def userSettingsMenu():
         commandHandler[res]() # Execute the respective command
         input("\n")
 
+def addResort():
+
+    resortDetails = askPersist(
+        ["name", "location", "price_per_night", "description", "facilities"],
+        title="| VV - Adding Resort |",
+        footer="Enter the details of this resort you'd like to add.\nEnter \"E\" to exit.",
+        breakPoints=["e"]
+    )
+
+    if resortDetails == "e": return
+
+    resort_Create(
+        name=resortDetails['name'],
+        location=resortDetails['location'],
+        price=resortDetails['price_per_night'],
+        description=resortDetails['description'],
+        facilities=resortDetails['facilities']
+    )
+
+    return print(f"Resort {resortDetails['name']} added successfully!")
+
+def removeResort():
+
+    while True:
+
+        print( tt.SingleTable([ [f"Enter the name of the resort you would like to delete\nPress 'e' to exit"] ]).table )   
+        resortName = input("> ")
+
+        if resortName == 'e': return
+
+        resort = resort_GetDetails(resortName)
+        if not resort:
+            print("[ERR] Invalid Resort Name.\n")
+            continue
+
+        resort_Delete(resortName)
+        return print('Resort',resort['name'],'was successfully deleted!')
+
+def changeResortName(resortName):
+
+    res = getValueForModification_Resort(resortName, "name")
+    if not res: return
+    resort_Modify(resortName, new_name=res)
+
+def updateLocation(resortName):
+
+    res = getValueForModification_Resort(resortName, "location")
+    if not res: return
+    resort_Modify(resortName, location=res)
+
+def updatePrice(resortName):
+
+    res = getValueForModification_Resort(resortName, "price", "Enter the new price per night of your resort")
+    if not res: return
+    try: int(res)
+    except ValueError:
+        print("That's not a number! Try again.")
+        return updatePrice(resortName)
+    resort_Modify(resortName, price=res)
+
+def updateDescription(resortName):
+    
+    res = getValueForModification_Resort(resortName, "description")
+    if not res: return
+    resort_Modify(resortName, description=res)
+
+def updateDescription(resortName):
+    
+    res = getValueForModification_Resort(resortName, "description")
+    if not res: return
+    resort_Modify(resortName, description=res)
+
+def updateFacilities(resortName):
+    
+    res = getValueForModification_Resort(resortName, "facilities")
+    if not res: return
+    resort_Modify(resortName, facilities=res)
+
+def getValueForModification_Resort(resortName, key, description=None):
+
+    resort = resort_GetDetails(resortName)
+    description = description or f"Enter the new {key} of your resort"
+
+    while True: 
+
+        print( tt.SingleTable([ [f"{description}\nPress 'e' to exit"] ]).table )   
+        res = input("> ")
+
+        if res == 'e': return
+
+        if res == resort[key]: 
+            clearScreen()
+            print(f"New {key} cannot be same as it's old {key}.")
+            continue
+        
+        print(f"Updated {key}!")
+        return res
+
+def resortSettingsMenu():
+
+    resortName = None
+
+    while True:
+
+        print( tt.SingleTable([ [f"Enter the name of the resort you would like to modify\nPress 'e' to exit"] ]).table )   
+        resortName = input("> ")
+
+        if resortName == 'e': return
+
+        resort = resort_GetDetails(resortName)
+        if not resort:
+            print("[ERR] Invalid Resort Name.\n")
+            continue
+        break
+
+    date = dt.datetime.today().strftime("%A | %I:%M %p")
+
+    rows = [ 
+        ["| Modifying Resort " + resort['name']],
+        ["  (1)", "Change Resort Name"],
+        ["  (2)", "Update Location"],
+        ["  (3)", "Update Price"],
+        ["  (4)", "Update Description"],
+        ["  (5)", "Update Facilities"],
+        ["| Misc."],
+        ["  (b)", "Go back to main menu"]
+    ]
+
+    commandHandler = {
+        1: changeResortName,
+        2: updateLocation,
+        3: updatePrice,
+        4: updateDescription,
+        5: updateFacilities
+    }
+
+    menuLayout = (
+        ["", "", "", "X"],
+        ['', f"", date + f"\nResort | {resortName}"],
+        ["","",""],
+        *rows
+    )
+
+    menuTable = tt.SingleTable(menuLayout, f"| VV - {resortName} |")
+    menuTable.justify_columns = {0: 'left', 1: "left", 3: 'right', 4: 'right'}
+    menuTable.outer_border = True
+    menuTable.inner_heading_row_border = True
+    menuTable.inner_column_border = False
+
+    while True:
+
+        clearScreen()
+        print(menuTable.table)
+        res = input("Enter the number of the command you'd like to execute\n> ")
+
+        try: res = int(res) # attempt to convert response to an integer
+        except ValueError: pass
+
+        if res == 'b': break
+
+        if res not in commandHandler.keys():
+            clearScreen()
+            print("That's an invalid command! Please only select a command from this list.")
+            continue
+
+        commandHandler[res](resortName) # Execute the respective command
+        input("\n")
+
+def seeAllBookings():
+
+    all_bookings = booking_GetAll()
+
+    bookingsTableData = []
+
+    for booking in all_bookings:
+        resort_details = resort_GetDetails(booking["resort_name"])
+        fullname = member_GetName(USERNAME)
+        sd = booking["start_date"]
+        ed = booking["end_date"]
+        bookingsTableData.extend(
+            [   
+                [''],
+                [f"| Booking {all_bookings.index(booking) + 1}"],
+                ["Resort:", booking["resort_name"]],
+                ["Located at", resort_details['location']],
+                ["Issued by", resort_details['username'] + " | " + fullname['first_name'] + ' ' + fullname['last_name']]
+                ["Booked for", f"{booking['occupants']} occupants"],
+                [f"Priced {booking['occupants']} x {resort_details['price']} = ", booking["cost"]],
+                [f"Check-in on {sd['day']}/{sd['month']}/{sd['year']} and Check-out on {sd['day']}/{sd['month']}{ ('/' + ed['year']) if sd['year'] != ed['year'] else ' during the same year'}"],
+                ["BOOKING ID", booking['id']],
+                ['']
+            ]
+        )
+    
+    bookingsTable = tt.SingleTable( bookingsTableData, f"| VV - All Bookings |" )
+    bookingsTable.justify_columns = {0: 'left', 1: "right"}
+    bookingsTable.outer_border = True
+    bookingsTable.inner_heading_row_border = False
+    bookingsTable.inner_column_border = False
+
+    clearScreen()
+    return print(bookingsTable.table)
+
+def seeBookingsForUser():
+
+    user = None
+
+    while True:
+
+        print( tt.SingleTable([ [f"Enter the name of the user whose bookings you would like to modify\nPress 'e' to exit"] ]).table )   
+        user = input("> ")
+
+        if user == 'e': return
+
+        if not member_GetLoginDetails(user):
+            print("[ERR] Invalid username. That user does not exist\n")
+            continue
+        break
+
+    all_bookings = member_GetBookings(user)
+
+    bookingsTableData = []
+
+    for booking in all_bookings:
+        resort_details = resort_GetDetails(booking["resort_name"])
+        first_name = member_GetName(USERNAME)["first_name"]
+        sd = booking["start_date"]
+        ed = booking["end_date"]
+        bookingsTableData.extend(
+            [   
+                [],
+                [f"| Booking {all_bookings.index(booking) + 1}"],
+                ["Resort:", booking["resort_name"]],
+                ["Located at", resort_details['location']],
+                ["Booked for", f"{booking['occupants']} occupants"],
+                [f"Priced {booking['occupants']} x {resort_details['price']} = ", booking["cost"]],
+                [f"Check-in on {sd['day']}/{sd['month']}/{sd['year']} and Check-out on {sd['day']}/{sd['month']}{ ('/' + ed['year']) if sd['year'] != ed['year'] else ' during the same year'}"],
+                ["BOOKING ID", booking['id']],
+                []
+            ]
+        )
+    
+    bookingsTable = tt.SingleTable( bookingsTableData, f"| VV - All Bookings for {first_name} |" )
+    bookingsTable.justify_columns = {0: 'left', 1: "right"}
+    bookingsTable.outer_border = True
+    bookingsTable.inner_heading_row_border = False
+    bookingsTable.inner_column_border = False
+
+    clearScreen()
+    return print(bookingsTable.table)
+
+def modifyUser():
+
+    user = None
+
+    while True:
+
+        print( tt.SingleTable([ [f"Enter the name of the user whose bookings you would like to modify\nPress 'e' to exit"] ]).table )   
+        user = input("> ")
+
+        if user == 'e': return
+
+        if not member_GetLoginDetails(user):
+            print("[ERR] Invalid username. That user does not exist\n")
+            continue
+        break
+
+    return userSettingsMenu(user)
+
+def deleteUser():
+
+    user = None
+
+    while True:
+
+        print( tt.SingleTable([ [f"Enter the name of the user you would like to delete\nPress 'e' to exit"] ]).table )   
+        user = input("> ")
+
+        if user == 'e': return
+
+        if not member_GetLoginDetails(user):
+            print("[ERR] Invalid username. That user does not exist\n")
+            continue
+        break
+
+    member_Delete(user)
+    return print("User", user, "was successfully deleted!")
+
+
 
 
 def adminMenu():
@@ -579,8 +878,7 @@ def adminMenu():
         ["| Bookings"],
         ["  (4)", "See bookings for a certain user"],
         ["  (5)", "See all bookings"],
-        ["  (5)", "Cancel a booking"],
-        ["  (6)", "Modify a booking"],
+        ["  (6)", "Cancel a booking"],
         ["| Users"],
         ["  (7)", "Modify a user"],
         ["  (8)", "Delete a user"],
@@ -589,6 +887,12 @@ def adminMenu():
     ]
 
     commandHandler = {
+        1: addResort,
+        2: removeResort,
+        3: resortSettingsMenu,
+        4: seeBookingsForUser,
+        5: seeAllBookings,
+        6: cancelBooking,
         'e': exit
     }
 
