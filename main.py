@@ -386,6 +386,7 @@ def clientMenu():
         3: bookResort,
         4: seeBookings,
         5: cancelBooking,
+        6: modifyUser,
         7: restart,
         'e': exit
     }

@@ -5,7 +5,9 @@ import datetime as dt
 #  MEMBER FUNCTIONS
 
 def member_GetName(username): # Gets the first and last name of a member and returns a dictionary
-    first_name, last_name = sf.getData("members", ("username", username), "firstName, lastName")
+    data = sf.getData("members", ("username", username), "firstName, lastName")
+    if not data: return {"first_name": "Unknown", "last_name": "Unknown"}
+    first_name, last_name = data
     return {"first_name": first_name, "last_name": last_name}
 
 def member_Create(username, first, last, password):
