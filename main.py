@@ -760,7 +760,7 @@ def seeAllBookings():
                 [f"| Booking {all_bookings.index(booking) + 1}"],
                 ["Resort:", booking["resort_name"]],
                 ["Located at", resort_details['location']],
-                ["Issued by", resort_details['username'] + " | " + fullname['first_name'] + ' ' + fullname['last_name']]
+                ["Issued by", resort_details['username'] + " | " + fullname['first_name'] + ' ' + fullname['last_name']],
                 ["Booked for", f"{booking['occupants']} occupants"],
                 [f"Priced {booking['occupants']} x {resort_details['price']} = ", booking["cost"]],
                 [f"Check-in on {sd['day']}/{sd['month']}/{sd['year']} and Check-out on {sd['day']}/{sd['month']}{ ('/' + ed['year']) if sd['year'] != ed['year'] else ' during the same year'}"],
