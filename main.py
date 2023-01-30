@@ -304,7 +304,7 @@ def bookResort():
             cost= cost
         )
         
-        print( tt.SingleTable([ ["Booking Created!\nYour booking ID is " + booking_id + "\nYou have chosen to pay by cash at the venue"] ]).table )
+        return print( tt.SingleTable([ ["Booking Created!\nYour booking ID is " + booking_id + "\nYou have chosen to pay by cash at the venue"] ]).table )
 
 def seeBookings():
     global USERNAME
